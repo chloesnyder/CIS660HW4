@@ -14,7 +14,7 @@
 #include <PRM/PRM_SpareData.h>
 #include <OP/OP_Operator.h>
 #include <OP/OP_OperatorTable.h>
-
+#include <UT/UT_String.h>
 
 #include <limits.h>
 #include "LSYSTEMPlugin.h"
@@ -56,7 +56,10 @@ newSopOperator(OP_OperatorTable *table)
 //static PRM_Name		angleName("angle", "Angle");
 
 
-
+static PRM_Name		angleName("angle", "Angle");
+static PRM_Name		stepSizeName("stepSize", "Step size");
+static PRM_Name		iterationsName("iterations", "Iterations");
+static PRM_Name		grammarFileName("grammarFile", "Grammar file");
 
 
 
@@ -73,6 +76,10 @@ newSopOperator(OP_OperatorTable *table)
 // For example : If you are declaring the inital value for the angle parameter
 // static PRM_Default angleDefault(30.0);	
 
+static PRM_Default angleDefault(30.0);
+static PRM_Default stepSizeDefault(2.0);
+static PRM_Default iterationsDefault(1.0);
+static PRM_Default grammarFileDefault(0, "");
 
 
 
@@ -93,6 +100,10 @@ SOP_Lsystem::myTemplateList[] = {
 // PRM_Template(PRM_FLT,	PRM_Template::PRM_EXPORT_MIN, 1, &angleName, &angleDefault, 0),
 // Similarly add all the other parameters in the template format here
 
+PRM_Template(PRM_FLT,	PRM_Template::PRM_EXPORT_MIN, 1, &angleName, &angleDefault, 0),
+PRM_Template(PRM_FLT,	PRM_Template::PRM_EXPORT_MIN, 1, &stepSizeName, &stepSizeDefault, 0),
+PRM_Template(PRM_FLT,	PRM_Template::PRM_EXPORT_MIN, 1, &iterationsName, &iterationsDefault, 0),
+PRM_Template(PRM_FILE,	PRM_Template::PRM_EXPORT_MIN, 1, &grammarFileName, &grammarFileDefault, 0),
 
 
 
@@ -175,6 +186,15 @@ SOP_Lsystem::cookMySop(OP_Context &context)
     //    NOTE : ANGLE is a function that you need to use and it is declared in the header file to update your values instantly while cooking 
 	LSystem myplant;
 
+	float angle, stepSize , iter;
+	angle = ANGLE(now);
+	stepSize = STEP_SIZE(now);
+	iter = ITERATIONS(now);
+
+	UT_String grammarFileUTStr = "";
+	GRAMMAR(grammarFileUTStr, now);
+	std::string grammarFile = grammarFileUTStr.toStdString();
+
 
 
 
@@ -195,7 +215,9 @@ SOP_Lsystem::cookMySop(OP_Context &context)
     // myplant.setDefaultAngle(30.0f);
     // myplant.setDefaultStep(1.0f);
 
-
+	myplant.loadProgram(grammarFile); // Does this need to be loadProgramFromString?
+	myplant.setDefaultAngle(angle);
+	myplant.setDefaultStep(stepSize);
 
 
 
@@ -210,7 +232,12 @@ SOP_Lsystem::cookMySop(OP_Context &context)
 	//	  myplant.process(i, branches);
 	//}
 
+	std::vector<LSystem::Branch> branches;
 
+	for (int i = 0; i < iter ; i++)
+	{
+		  myplant.process(i, branches);
+	}
 
 
 
@@ -231,6 +258,9 @@ SOP_Lsystem::cookMySop(OP_Context &context)
     GU_PrimPoly		*poly;
     int			 i;
     UT_Interrupt	*boss;
+
+
+
 
     // Since we don't have inputs, we don't need to lock them.
 
@@ -265,7 +295,39 @@ SOP_Lsystem::cookMySop(OP_Context &context)
 		// Also use GA_Offset ptoff = poly->getPointOffset()
 		// and gdp->setPos3(ptoff,YOUR_POSITION_VECTOR) to build geometry.
 
+		poly = GU_PrimPoly::build(gdp, divisions, GU_POLY_OPEN);
+		float tinc = M_PI * 2 / (float)divisions;
 
+		for (int b = 0; b < branches.size(); b++)
+		{
+			LSystem::Branch currBranch = branches.at(b);
+			vec3 start = currBranch.first;
+			vec3 end = currBranch.second;
+
+			for (i = 0; i < divisions; i++)
+			{
+				if (boss->opInterrupt()) break;
+
+				myCurrPoint = i;
+				tmp = (float)i * tinc; // angle to rotate point by
+				rad = 2.0; // radius
+				tx = end[0] - start[0] / 2.0; // center of cylinder
+				ty = end[1] - start[1] / 2.0;
+				tz = end[2] - start[2] / 2.0;
+				pos(xcoord) = cos(tmp) * rad + tx;
+				pos(ycoord) = sin(tmp) * rad + ty;
+				pos(zcoord) = tz;
+				pos(4) = 1.0;
+
+				GA_Offset ptoff = poly->getPointOffset(i);
+				gdp->setPos4(ptoff, pos);
+			}
+
+
+
+
+
+		}
 
 
 

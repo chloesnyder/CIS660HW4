@@ -61,9 +61,11 @@ private:
 	// Example : To declare a function to fetch angle you need to do it this way 
 	// fpreal  ANGLE(fpreal t)     { return evalFloat("angle", 0, t); }
 
-	
+	fpreal  ANGLE(fpreal t)     { return evalFloat("angle", 0, t); }
+	fpreal  STEP_SIZE(fpreal t)     { return evalFloat("stepSize", 0, t); }
+	fpreal  ITERATIONS(fpreal t)     { return evalFloat("iterations", 0, t); }
 
-
+	void GRAMMAR(UT_String &ut_str, fpreal t) { evalString(ut_str, "grammarFile", 0, t); }
 
 
 
