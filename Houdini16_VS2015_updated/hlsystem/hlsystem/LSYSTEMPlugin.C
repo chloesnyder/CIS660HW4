@@ -295,6 +295,10 @@ SOP_Lsystem::cookMySop(OP_Context &context)
 		// Also use GA_Offset ptoff = poly->getPointOffset()
 		// and gdp->setPos3(ptoff,YOUR_POSITION_VECTOR) to build geometry.
 
+		//https://github.com/helgemathee/Splice_Houdini/blob/master/SOP_Star.h
+		//https://github.com/helgemathee/Splice_Houdini/blob/master/SOP_Star.C
+		// SOP_Star
+
 		poly = GU_PrimPoly::build(gdp, divisions, GU_POLY_OPEN);
 		float tinc = M_PI * 2 / (float)divisions;
 
@@ -323,37 +327,7 @@ SOP_Lsystem::cookMySop(OP_Context &context)
 				gdp->setPos4(ptoff, pos);
 			}
 
-
-
-
-
 		}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 		////////////////////////////////////////////////////////////////////////////////////////////
