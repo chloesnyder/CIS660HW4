@@ -307,10 +307,9 @@ SOP_Lsystem::cookMySop(OP_Context &context)
 			UT_Vector3 posStart = UT_Vector3(start[xcoord], start[ycoord], start[zcoord]);
 			UT_Vector3 posEnd = UT_Vector3(end[xcoord], end[ycoord], end[zcoord]);
 
-			GA_Offset ptoffstart = poly->getPointOffset(start.); //what is this suppsoed to take in?
-			GA_Offset ptoffend = poly->getPointOffset(end);
-			gdp->setPos3(ptoffstart, posStart);
-			gdp->setPos3(ptoffend, posEnd);
+			GA_Offset ptoff= poly->getPointOffset(myCurrPoint); 
+			gdp->setPos3(ptoff, posStart);
+			gdp->setPos3(ptoff, posEnd);
 
 		}
 		/*//https://github.com/helgemathee/Splice_Houdini/blob/master/SOP_Star.h
