@@ -296,6 +296,8 @@ SOP_Lsystem::cookMySop(OP_Context &context)
 		// and gdp->setPos3(ptoff,YOUR_POSITION_VECTOR) to build geometry.
 
 
+
+
 		for (int b = 0; b < branches.size(); b++)
 		{
 			poly = GU_PrimPoly::build(gdp, 2, GU_POLY_OPEN);
@@ -307,45 +309,13 @@ SOP_Lsystem::cookMySop(OP_Context &context)
 			UT_Vector3 posStart = UT_Vector3(start[xcoord], start[ycoord], start[zcoord]);
 			UT_Vector3 posEnd = UT_Vector3(end[xcoord], end[ycoord], end[zcoord]);
 
-			GA_Offset ptoff= poly->getPointOffset(myCurrPoint); 
-			gdp->setPos3(ptoff, posStart);
-			gdp->setPos3(ptoff, posEnd);
+			GA_Offset ptoffStart = poly->getPointOffset(0);
+			GA_Offset ptoffEnd = poly->getPointOffset(1);
+			gdp->setPos3(ptoffStart, posStart);
+			gdp->setPos3(ptoffEnd, posEnd);
 
 		}
-		/*//https://github.com/helgemathee/Splice_Houdini/blob/master/SOP_Star.h
-		//https://github.com/helgemathee/Splice_Houdini/blob/master/SOP_Star.C
-		// SOP_Star
 
-		poly = GU_PrimPoly::build(gdp, divisions, GU_POLY_OPEN);
-		float tinc = M_PI * 2 / (float)divisions;
-
-		for (int b = 0; b < branches.size(); b++)
-		{
-			LSystem::Branch currBranch = branches.at(b);
-			vec3 start = currBranch.first;
-			vec3 end = currBranch.second;
-
-			for (i = 0; i < divisions; i++)
-			{
-				if (boss->opInterrupt()) break;
-
-				myCurrPoint = i;
-				tmp = (float)i * tinc; // angle to rotate point by
-				rad = 2.0; // radius
-				tx = end[xcoord] - start[xcoord] / 2.0; // center of cylinder
-				ty = end[ycoord] - start[ycoord] / 2.0;
-				tz = end[zcoord] - start[zcoord] / 2.0;
-				pos(xcoord) = cos(tmp) * rad + tx;
-				pos(ycoord) = sin(tmp) * rad + ty;
-				pos(zcoord) = tz;
-				pos(4) = 1.0;
-
-				GA_Offset ptoff = poly->getPointOffset(i);
-				gdp->setPos4(ptoff, pos);
-			}
-
-		}
-		*/
 
 		////////////////////////////////////////////////////////////////////////////////////////////
 
