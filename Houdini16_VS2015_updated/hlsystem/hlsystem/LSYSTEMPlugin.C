@@ -1,6 +1,6 @@
 
 
-
+#pragma once
 #include <UT/UT_DSOVersion.h>
 //#include <RE/RE_EGLServer.h>
 
